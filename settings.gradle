@@ -1,1 +1,1 @@
-include ':app', ':common', ':base', ':audio'
+include ':sample-jme-startravel', ':gvr-common', ':gvr-base', ':gvr-audio'

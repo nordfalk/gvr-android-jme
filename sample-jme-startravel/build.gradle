@@ -30,8 +30,8 @@ dependencies {
     //compile "org.jmonkeyengine:jme3-plugins:$jmeEngineVersion"
     compile "org.jmonkeyengine:jme3-android:$jmeEngineVersion"
     compile "org.jmonkeyengine:jme3-android-native:$jmeEngineVersion"
-    compile project(':base')
-    compile project(':common')
-    compile project(':audio')
+    compile project(':gvr-base')
+    compile project(':gvr-common')
+    compile project(':gvr-audio')
     compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
 }
