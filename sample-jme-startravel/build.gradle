@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
     defaultConfig {
         applicationId "jme3test.android.startravel2"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -18,21 +18,7 @@ android {
     }
 }
 
-ext.jmeEngineVersion = '3.1.0-beta1';
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    // jME libraries
-    compile "org.jmonkeyengine:jme3-core:$jmeEngineVersion"
-    //compile "org.jmonkeyengine:jme3-lwjgl:$jmeEngineVersion"
-    //compile "org.jmonkeyengine:jme3-effects:$jmeEngineVersion"
-    //compile "org.jmonkeyengine:jme3-blender:$jmeEngineVersion"
-    //compile "org.jmonkeyengine:jme3-plugins:$jmeEngineVersion"
-    compile "org.jmonkeyengine:jme3-android:$jmeEngineVersion"
-    compile "org.jmonkeyengine:jme3-android-native:$jmeEngineVersion"
-    compile project(':gvr-base')
-    compile project(':gvr-common')
-    compile project(':gvr-audio')
-    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
     compile project(':jme-gvr-bridge')
 }
