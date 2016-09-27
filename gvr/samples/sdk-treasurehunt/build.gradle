@@ -35,9 +35,9 @@ android {
 }
 
 dependencies {
-    compile project(':gvr-base')
-    compile project(':gvr-common')
-    compile project(':gvr-audio')
+    compile project(':gvr:base')
+    compile project(':gvr:common')
+    compile project(':gvr:audio')
 
     compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
 }
