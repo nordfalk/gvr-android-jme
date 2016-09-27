@@ -9,11 +9,15 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
+        multiDexEnabled true
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles.add(file('../proguard-gvr.txt'))
         }
     }
 }
@@ -21,17 +25,18 @@ android {
 ext.jmeEngineVersion = '3.1.0-beta1';
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    // GVR libraries
+    compile project(':gvr:base')
+    compile project(':gvr:common')
+    compile project(':gvr:audio')
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
     // jME libraries
     compile "org.jmonkeyengine:jme3-core:$jmeEngineVersion"
     //compile "org.jmonkeyengine:jme3-lwjgl:$jmeEngineVersion"
     //compile "org.jmonkeyengine:jme3-effects:$jmeEngineVersion"
     //compile "org.jmonkeyengine:jme3-blender:$jmeEngineVersion"
     //compile "org.jmonkeyengine:jme3-plugins:$jmeEngineVersion"
-    compile "org.jmonkeyengine:jme3-android:$jmeEngineVersion"
-    compile "org.jmonkeyengine:jme3-android-native:$jmeEngineVersion"
-    compile project(':gvr:base')
-    compile project(':gvr:common')
-    compile project(':gvr:audio')
-    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
+    compile "org.jmonkeyengine:jme3-android:$jmeEngineVersion";
+    compile "org.jmonkeyengine:jme3-android-native:$jmeEngineVersion";
 }

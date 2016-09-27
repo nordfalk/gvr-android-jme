@@ -28,7 +28,6 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
             proguardFiles.add(file('../../proguard-gvr.txt'))
         }
     }
@@ -38,6 +37,5 @@ dependencies {
     compile project(':gvr:base')
     compile project(':gvr:common')
     compile project(':gvr:audio')
-
     compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
 }

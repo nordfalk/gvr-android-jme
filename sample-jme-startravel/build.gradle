@@ -9,11 +9,15 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
+        multiDexEnabled true
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles.add(file('../proguard-gvr.txt'))
         }
     }
 }
