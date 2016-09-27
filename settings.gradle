@@ -1,6 +1,7 @@
-include ':sample-jme-startravel', ':jme-gvr-bridge'
-
+include ':jme-gvr-bridge'
 include ':gvr:base'
 include ':gvr:common'
 include ':gvr:audio'
 include ':gvr:samples:sdk-treasurehunt'
+include ':sample-jme-startravel'
+include ':sample-jme-jaime'

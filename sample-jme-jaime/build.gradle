@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+    defaultConfig {
+        applicationId "jme3test.android.jaime"
+        minSdkVersion 19
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        // Exclude architectures beyond those that are included in GVR to avoid
+        // UnsatisfiedLinkError: couldn't find "libgvrbase.so"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86"
+        }
+
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            proguardFiles.add(file('../proguard-gvr.txt'))
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':jme-gvr-bridge')
+}

@@ -5,12 +5,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.google.vr.sdk.base.GvrActivity;
+import com.google.vr.sdk.base.GvrView;
 import com.jme3.input.TouchInput;
 import com.jme3.input.controls.TouchListener;
 import com.jme3.input.controls.TouchTrigger;
@@ -226,6 +225,13 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
 
         // TODO: Verify if this is a good idea (way to link head-position to camera)
         ctx.setApp(app);
+    }
+
+    @Override
+    public void setGvrView(GvrView gvrView, boolean enableVrModeFallbacks) {
+        // Need to get hold on a view to let AndroidLocator load its assets
+        JmeAndroidGvrSystem.setView(gvrView);
+        super.setGvrView(gvrView, enableVrModeFallbacks);
     }
 
     @Override
