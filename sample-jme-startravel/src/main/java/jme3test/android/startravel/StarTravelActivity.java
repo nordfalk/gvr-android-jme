@@ -213,7 +213,7 @@ public class StarTravelActivity extends AndroidGvrHarness implements GvrView.Ste
    */
   @Override
   public void onCardboardTrigger() {
-    Log.i(TAG, "onCardboardTrigger");
+    Log.i(TAG, "onCardboardTrigger XXXX");
 
     // Always give user feedback.
     vibrator.vibrate(50);
