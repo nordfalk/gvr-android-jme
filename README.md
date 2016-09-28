@@ -1,6 +1,6 @@
 # gvr-android-jme
 
-JMonkeyEngine integration with Google VR SDK 1.0 for Android http://developers.google.com/vr/android/
+JMonkeyEngine integration with Google Cardboard VR SDK 1.0 for Android http://developers.google.com/vr/android/
 
 Works in the Android Emulator for x86
 
@@ -29,3 +29,43 @@ Enter the settings of the emulator and change Graphics to "Software - GLES 2.0" 
 # Further information
 
 Join the discussion at https://hub.jmonkeyengine.org/t/google-cardboard-support/31684
+
+
+# Troubleshooting
+
+
+## UnsatisfiedLinkError: couldn't find "libgvrbase.so"
+
+You need to exclude JME processor archtectures that are not supported by GVR. In build.gradle, add the following
+
+    defaultConfig {
+        ...
+        // Exclude architectures beyond those that are included in GVR to avoid
+        // UnsatisfiedLinkError: couldn't find "libgvrbase.so"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86"
+        }
+        ...
+    }
+
+## Nothing is rendered, a lot of errors in LogCat about AudioRenderer initialization failed
+
+If nothing renders and you can see a lot of errors in LogCat about AudioRenderer initialization failed then
+you can fix it by disabling the OpenAL Soft based renderer for Android audio.
+
+        settings.setAudioRenderer(AppSettings.ANDROID_MEDIAPLAYER);
+
+Problem is, the current API is really clumsy and dont allow to modify the settings.
+
+## I need to modify the settings
+
+Only way I found (this is a really clumsy solution) is to override setSettings()
+
+  public class TestJaime extends SimpleApplication {
+
+    @Override
+    public void setSettings(AppSettings settings) {
+        settings.setAudioRenderer(AppSettings.ANDROID_MEDIAPLAYER);
+        super.setSettings(settings);
+    }
+
