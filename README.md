@@ -50,8 +50,20 @@ You need to exclude JME processor archtectures that are not supported by GVR. In
 
 ## Nothing is rendered, a lot of errors in LogCat about AudioRenderer initialization failed
 
-If nothing renders and you can see a lot of errors in LogCat about AudioRenderer initialization failed then
-you can fix it by disabling the OpenAL Soft based renderer for Android audio.
+If nothing renders and you can see a lot of errors in LogCat about AudioRenderer initialization failed, like:
+
+    W/System.err: java.lang.IllegalArgumentException: Bad limit (capacity 0): 1
+    W/System.err:     at java.nio.Buffer.limit(Buffer.java:298)
+    W/System.err:     at com.jme3.audio.openal.ALAudioRenderer.initOpenAL(ALAudioRenderer.java:152)
+    W/System.err:     at com.jme3.audio.openal.ALAudioRenderer.initialize(ALAudioRenderer.java:225)
+    W/System.err:     at com.jme3.app.LegacyApplication.initAudio(LegacyApplication.java:283)
+    W/System.err:     at com.jme3.app.LegacyApplication.initialize(LegacyApplication.java:603)
+    W/System.err:     at com.jme3.app.SimpleApplication.initialize(SimpleApplication.java:178)
+    W/System.err:     at com.jme3.app.AndroidGvrHarness.initialize(AndroidGvrHarness.java:385)
+    W/System.err:     at com.jme3.system.android.GvrOGLESContext.onDrawEye(GvrOGLESContext.java:294)
+
+
+Then you can fix it by disabling the OpenAL Soft based renderer for Android audio.
 
         settings.setAudioRenderer(AppSettings.ANDROID_MEDIAPLAYER);
 

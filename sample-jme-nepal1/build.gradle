@@ -27,7 +27,9 @@ android {
     }
 }
 
+ext.jmeEngineVersion = '3.1.0-beta1';
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':jme-gvr-bridge')
+    compile "org.jmonkeyengine:jme3-terrain:$jmeEngineVersion"
 }
