@@ -6,7 +6,10 @@ package jme3test.android.nepal1;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
@@ -45,6 +48,9 @@ public class TestNepal extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        Material fireMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+        fireMat.setTexture("Texture", assetManager.loadTexture("Textures/flame.png"));
+
         Texture manoj = assetManager.loadTexture("Textures/klippet-manoj.png");
 
         Node laxmiBrik = lavBrik(assetManager.loadTexture("Textures/klippet-laxmi.png"));
@@ -60,7 +66,12 @@ public class TestNepal extends SimpleApplication {
                 new Spiller(abishakBrik, "Abishak"),
                 new Spiller(bishalBrik, "Bishal")));
 
-        rootNode.attachChild(assetManager.loadModel("Scenes/spilScene.j3o"));
+        Spatial spilscene = assetManager.loadModel("Scenes/spilScene.j3o");
+        rootNode.attachChild(spilscene);
+
+        for (Spiller spiller : spillere) {
+            spiller.node.attachChild(createParticleEmitter(spiller.navn, fireMat));
+        }
 
         for (int i=1; ; i++) {
             Spatial felt = rootNode.getChild("Felt"+i);
@@ -76,9 +87,10 @@ public class TestNepal extends SimpleApplication {
         rootNode.attachChild(bishalBrik);
 
         // Ryk kameraet op og til siden
-        cam.setLocation( cam.getLocation().add(2, 3, -3));
+        cam.setLocation( cam.getLocation().add(2, -6, -4));
         cam.lookAt(new Vector3f(), new Vector3f(0, 1, 0)); // peg det ind på spillepladen
 
+        rootNode.rotate(FastMath.PI, 0f, 0f);
     }
 
     private Node lavBrik(Texture billede) {
@@ -148,4 +160,22 @@ public class TestNepal extends SimpleApplication {
             }
         }
     }
+
+    private ParticleEmitter createParticleEmitter(final String playerName, final Material material) {
+        ParticleEmitter fireEffect = new ParticleEmitter(playerName+"Emitter", ParticleMesh.Type.Triangle, 2);
+        fireEffect.setMaterial(material);
+        fireEffect.setImagesX(2);
+        fireEffect.setImagesY(2);
+        fireEffect.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));
+        fireEffect.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
+        fireEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0f, 0.1f, 0f));
+        fireEffect.setStartSize(2.0f);
+        fireEffect.setEndSize(0.1f);
+        fireEffect.setGravity(0f, 3f, 0f);
+        fireEffect.setLowLife(0.5f);
+        fireEffect.setHighLife(2f);
+        fireEffect.getParticleInfluencer().setVelocityVariation(10.8f);
+        return fireEffect;
+    }
+
 }
