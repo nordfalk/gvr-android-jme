@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * @author Nehon
+ * @author rudz
  */
 public class TestNepal extends SimpleApplication {
 

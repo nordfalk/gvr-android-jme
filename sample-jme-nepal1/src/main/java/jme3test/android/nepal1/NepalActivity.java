@@ -31,14 +31,6 @@ import com.jme3.app.AndroidGvrHarness;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
-/**
- * A Google VR sample application.
- * </p><p>
- * The TreasureHunt scene consists of a planar ground grid and a floating
- * "treasure" cube. When the user looks at the cube, the cube will turn gold.
- * While gold, the user can activate the Carboard trigger, which will in turn
- * randomly reposition the cube.
- */
 public class NepalActivity extends AndroidGvrHarness implements GvrView.StereoRenderer {
 
     private static final String TAG = "NepalActivity";
@@ -59,6 +51,7 @@ public class NepalActivity extends AndroidGvrHarness implements GvrView.StereoRe
      * @param label
      *         Label to report in case of error.
      */
+    @SuppressWarnings("LoopStatementThatDoesntLoop")
     private static void checkGLError(String label) {
         int error;
         while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
