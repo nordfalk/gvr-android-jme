@@ -1,5 +1,6 @@
 package jme3test.android.nepal1;
 
+import com.jme3.math.Transform;
 import com.jme3.scene.Node;
 
 /**
@@ -12,12 +13,14 @@ import com.jme3.scene.Node;
  */
 
 public class Spiller {
-    public final Node brik;
+    public final Node node;
     public final String navn;
     int feltNr;
+    Transform rykFra;
+    Transform rykTil;
 
     Spiller(Node laxmiBrik, String laxmi) {
-        brik = laxmiBrik;
+        node = laxmiBrik;
         navn = laxmi;
     }
 }
