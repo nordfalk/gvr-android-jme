@@ -101,7 +101,8 @@ public class GvrOGLESContext implements JmeContext, GvrView.StereoRenderer, Soft
         super();
     }
 
-    public GvrOGLESContext(final AppSettings settings) {
+    GvrOGLESContext(final AppSettings settings) {
+        super();
         setSettings(settings);
     }
 

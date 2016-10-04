@@ -35,7 +35,7 @@ dependencies {
     compile project(':gvr:base')
     compile project(':gvr:common')
     compile project(':gvr:audio')
-    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.1.0'
     // jME libraries
     compile "org.jmonkeyengine:jme3-core:$jmeEngineVersion"
     compile "org.jmonkeyengine:jme3-android:$jmeEngineVersion";
