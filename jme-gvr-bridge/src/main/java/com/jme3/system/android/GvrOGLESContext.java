@@ -289,7 +289,7 @@ public class GvrOGLESContext implements JmeContext, GvrView.StereoRenderer, Soft
         }
 
         if (!renderable.get()) {
-            if (created.get()) {
+            if (created.get()) try {
                 logger.fine("GL Surface is setup, initializing application");
                 listener.initialize();
 
@@ -297,6 +297,12 @@ public class GvrOGLESContext implements JmeContext, GvrView.StereoRenderer, Soft
                 //Camera cam = app.getCamera();
 
                 renderable.set(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("SEVERE ERROR - EXITING !");
+                // com.google.vr.sdk.base.CardboardViewNativeImpl.nativeOnDrawFrame(Native Method) does not kill the app
+                // (as of GVR 1.0 / october 1st 2016), so we must do it ourselves to avoid loops
+                System.exit(-1);
             }
         } else {
             if (!created.get()) {
