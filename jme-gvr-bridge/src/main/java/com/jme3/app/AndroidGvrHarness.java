@@ -2,10 +2,9 @@ package com.jme3.app;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.google.vr.sdk.base.GvrActivity;
@@ -29,15 +28,25 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * <code>AndroidHarness</code> wraps a jme application object and runs it on
+ * <code>AndroidGvrHarness</code> wraps a jme application object and runs it on
  * Android
  *
  * @author Kirill
  * @author larynx
+ *
+ * - Reduced branching a bit
+ * - Reduced memory use slightly
+ * - Replaced deprecated method for retrieving android screen size (height, width)
+ * @author rudz
  */
 public class AndroidGvrHarness extends GvrActivity implements TouchListener, DialogInterface.OnClickListener, SystemListener {
 
-    protected final static Logger logger = Logger.getLogger(AndroidGvrHarness.class.getName());
+    private final static Logger logger = Logger.getLogger(AndroidGvrHarness.class.getName());
+
+    /**
+     * The tag for logcat output
+     */
+    private static final String TAG = "AndroidGvrHarness";
     /**
      * The application class to start
      */
@@ -51,7 +60,7 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
      * Sets the desired RGB size for the surfaceview.  16 = RGB565, 24 = RGB888.
      * (default = 24)
      */
-    protected int eglBitsPerPixel = 24;
+    protected final int eglBitsPerPixel = 24;
 
     /**
      * Sets the desired number of Alpha bits for the surfaceview.  This affects
@@ -62,26 +71,26 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
      * 8 or higher = Translucent surfaceview background
      * (default = 0)
      */
-    protected int eglAlphaBits = 0;
+    protected final int eglAlphaBits = 0;
 
     /**
      * The number of depth bits specifies the precision of the depth buffer.
      * (default = 16)
      */
-    protected int eglDepthBits = 16;
+    protected final int eglDepthBits = 16;
 
     /**
      * Sets the number of samples to use for multisampling.</br>
      * Leave 0 (default) to disable multisampling.</br>
      * Set to 2 or 4 to enable multisampling.
      */
-    protected int eglSamples = 0;
+    protected final int eglSamples = 0;
 
     /**
      * Set the number of stencil bits.
      * (default = 0)
      */
-    protected int eglStencilBits = 0;
+    protected final int eglStencilBits = 0;
 
     /**
      * Sets the type of Audio Renderer to be used.
@@ -94,47 +103,47 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
      * Only use ANDROID_ static strings found in AppSettings
      *
      */
-    protected String audioRendererType = AppSettings.ANDROID_OPENAL_SOFT;
+    protected final String audioRendererType = AppSettings.ANDROID_OPENAL_SOFT;
 
     /**
      * If true Android Sensors are used as simulated Joysticks. Users can use the
      * Android sensor feedback through the RawInputListener or by registering
      * JoyAxisTriggers.
      */
-    protected boolean joystickEventsEnabled = false;
+    protected final boolean joystickEventsEnabled = false;
     /**
      * If true KeyEvents are generated from TouchEvents
      */
-    protected boolean keyEventsEnabled = true;
+    protected final boolean keyEventsEnabled = true;
     /**
      * If true MouseEvents are generated from TouchEvents
      */
-    protected boolean mouseEventsEnabled = true;
+    protected final boolean mouseEventsEnabled = true;
     /**
      * Flip X axis
      */
-    protected boolean mouseEventsInvertX = false;
+    protected final boolean mouseEventsInvertX = false;
     /**
      * Flip Y axis
      */
-    protected boolean mouseEventsInvertY = false;
+    protected final boolean mouseEventsInvertY = false;
     /**
      * if true finish this activity when the jme app is stopped
      */
-    protected boolean finishOnAppStop = true;
+    protected final boolean finishOnAppStop = true;
     /**
      * set to false if you don't want the harness to handle the exit hook
      */
-    protected boolean handleExitHook = true;
+    protected final boolean handleExitHook = true;
     /**
      * Title of the exit dialog, default is "Do you want to exit?"
      */
-    protected String exitDialogTitle = "Do you want to exit?";
+    protected final String exitDialogTitle = "Do you want to exit?";
     /**
      * Message of the exit dialog, default is "Use your home key to bring this
      * app into the background or exit to terminate it."
      */
-    protected String exitDialogMessage = "Use your home key to bring this app into the background or exit to terminate it.";
+    protected final String exitDialogMessage = "Use your home key to bring this app into the background or exit to terminate it.";
 
 
     protected GvrOGLESContext ctx;
@@ -143,11 +152,12 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
     private boolean inConfigChange = false;
 
     public AndroidGvrHarness() {
+        super();
         // TODO: Find out if this was the right place to put this
         JmeSystem.setSystemDelegate(new JmeAndroidGvrSystem());
     }
 
-    private class DataObject {
+    private static class DataObject {
         protected LegacyApplication app = null;
     }
 
@@ -168,15 +178,12 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
         super.onCreate(savedInstanceState);
 
         final DataObject data = (DataObject) getLastNonConfigurationInstance();
-        if (data != null) {
-            logger.log(Level.FINE, "Using Retained App");
-            this.app = data.app;
-        } else {
+        if (data == null) {
             // Discover the screen resolution
             //TODO try to find a better way to get a hand on the resolution
-            WindowManager wind = this.getWindowManager();
-            Display disp = wind.getDefaultDisplay();
-            Log.d("AndroidHarness", "Resolution from Window, width:" + disp.getWidth() + ", height: " + disp.getHeight());
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
+            Log.d(TAG, "Resolution from Window, width:" + Integer.toString(size.x) + ", height: " + Integer.toString(size.y));
 
             // Create Settings
             logger.log(Level.FINE, "Creating settings");
@@ -192,7 +199,7 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
             settings.setSamples(eglSamples);
             settings.setStencilBits(eglStencilBits);
 
-            settings.setResolution(disp.getWidth(), disp.getHeight());
+            settings.setResolution(size.x, size.y);
             settings.setAudioRenderer(audioRendererType);
 
             settings.setFrameRate(-1);
@@ -214,9 +221,11 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
                 handleError("Class " + appClass + " init failed", ex);
                 //setContentView(new TextView(this));
             }
-            Log.i("AndroidGvrHArnes", "The app (" + appClass + ") is made");
+            Log.i(TAG, "The app (" + appClass + ") is made");
+        } else {
+            logger.log(Level.FINE, "Using Retained App");
+            this.app = data.app;
         }
-
 
         ctx = (GvrOGLESContext) app.getContext();
         // store the glSurfaceView in JmeAndroidSystem for future use
@@ -307,55 +316,41 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
             title = t.toString();
         }
 
-        final String finalTitle = title;
-        final String finalMsg = (errorMsg != null ? errorMsg : "Uncaught Exception")
-                + "\n" + stackTrace;
+        final String finalMsg = (errorMsg != null ? errorMsg : "Uncaught Exception") + '\n' + stackTrace;
 
         logger.log(Level.SEVERE, finalMsg);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                AlertDialog dialog = new AlertDialog.Builder(AndroidGvrHarness.this) // .setIcon(R.drawable.alert_dialog_icon)
-                        .setTitle(finalTitle).setPositiveButton("Kill", AndroidGvrHarness.this).setMessage(finalMsg).create();
-                dialog.show();
-            }
-        });
+        runOnUiThread(new DialogRunnable(title, finalMsg));
     }
 
     /**
      * Called by the android alert dialog, terminate the activity and OpenGL
      * rendering
      *
-     * @param dialog
-     * @param whichButton
+     * @param dialog The dialog interface
+     * @param whichButton The button that was pressed
      */
     public void onClick(DialogInterface dialog, int whichButton) {
-        if (whichButton != -2) {
-            if (app != null) {
-                app.stop(true);
-            }
-            app = null;
-            this.finish();
+        if (whichButton == -2) {
+            return;
         }
+        if (app != null) {
+            app.stop(true);
+        }
+        app = null;
+        this.finish();
     }
 
     /**
      * Gets called by the InputManager on all touch/drag/scale events
      */
+    @SuppressWarnings("CallToStringEquals")
     @Override
     public void onTouch(String name, TouchEvent evt, float tpf) {
         if (name.equals(ESCAPE_EVENT)) {
             switch (evt.getType()) {
                 case KEY_UP:
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AlertDialog dialog = new AlertDialog.Builder(AndroidGvrHarness.this) // .setIcon(R.drawable.alert_dialog_icon)
-                                    .setTitle(exitDialogTitle).setPositiveButton("Yes", AndroidGvrHarness.this).setNegativeButton("No", AndroidGvrHarness.this).setMessage(exitDialogMessage).create();
-                            dialog.show();
-                        }
-                    });
+                    runOnUiThread(new ExitDialogRunnable());
                     break;
                 default:
                     break;
@@ -368,11 +363,11 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
      * entries lower than INFO level and adds a handler that produces
      * JME formatted log messages.
      */
-    protected void initializeLogHandler() {
+    protected static void initializeLogHandler() {
         Logger log = LogManager.getLogManager().getLogger("");
         for (Handler handler : log.getHandlers()) {
             if (log.getLevel() != null && log.getLevel().intValue() <= Level.FINE.intValue()) {
-                Log.v("AndroidHarness", "Removing Handler class: " + handler.getClass().getName());
+                Log.v(TAG, "Removing Handler class: " + handler.getClass().getName());
             }
             log.removeHandler(handler);
         }
@@ -392,7 +387,7 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
             }
 
             app.getInputManager().addMapping(ESCAPE_EVENT, new TouchTrigger(TouchInput.KEYCODE_BACK));
-            app.getInputManager().addListener(this, new String[]{ESCAPE_EVENT});
+            app.getInputManager().addListener(this, ESCAPE_EVENT);
         }
     }
 
@@ -412,6 +407,7 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
         if (app != null) {
             app.destroy();
         }
+
         if (finishOnAppStop) {
             finish();
         }
@@ -488,5 +484,32 @@ public class AndroidGvrHarness extends GvrActivity implements TouchListener, Dia
             */
         }
         isGLThreadPaused = true;
+    }
+
+    private class DialogRunnable implements Runnable {
+        private final String title;
+        private final String finalMsg;
+
+        DialogRunnable(final String title, final String finalMsg) {
+            super();
+            this.title = title;
+            this.finalMsg = finalMsg;
+        }
+
+        @Override
+        public void run() {
+            AlertDialog dialog = new AlertDialog.Builder(AndroidGvrHarness.this) // .setIcon(R.drawable.alert_dialog_icon)
+                    .setTitle(title).setPositiveButton("Kill", AndroidGvrHarness.this).setMessage(finalMsg).create();
+            dialog.show();
+        }
+    }
+
+    private class ExitDialogRunnable implements Runnable {
+        @Override
+        public void run() {
+            AlertDialog dialog = new AlertDialog.Builder(AndroidGvrHarness.this) // .setIcon(R.drawable.alert_dialog_icon)
+                    .setTitle(exitDialogTitle).setPositiveButton("Yes", AndroidGvrHarness.this).setNegativeButton("No", AndroidGvrHarness.this).setMessage(exitDialogMessage).create();
+            dialog.show();
+        }
     }
 }

@@ -5,7 +5,7 @@ import com.jme3.scene.Node;
 
 class Spiller {
     final Node node;
-    private final String navn;
+    final String navn;
     int feltNr;
     Transform rykFra;
     Transform rykTil;
