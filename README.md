@@ -60,3 +60,8 @@ Right now the only way I found (this is a really clumsy solution) is to override
         super.setSettings(settings);
     }
 
+## I can only see anything in the center - the objects disappear when not in the center
+
+Culling is too aggressive in GVR - so disable it for now
+
+    rootNode.setCullHint(Spatial.CullHint.Never);

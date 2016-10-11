@@ -10,6 +10,7 @@ import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -74,6 +75,10 @@ public class TestNepal extends SimpleApplication {
         rootNode.attachChild(laxmiBrik);
         rootNode.attachChild(abishakBrik);
         rootNode.attachChild(bishalBrik);
+
+        // Culling is too aggressive in GVR - so disable it for now
+        rootNode.setCullHint(Spatial.CullHint.Never);
+
 
         // Ryk kameraet op og til siden
         cam.setLocation( cam.getLocation().add(2, 3, -3));
