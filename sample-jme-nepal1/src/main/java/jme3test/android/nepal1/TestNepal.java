@@ -6,6 +6,7 @@ package jme3test.android.nepal1;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.plugins.AndroidLocator;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Transform;
@@ -61,6 +62,10 @@ public class TestNepal extends SimpleApplication {
                 new Spiller(abishakBrik, "Abishak"),
                 new Spiller(bishalBrik, "Bishal")));
 
+        // Workaround for missing texture because of wrong path in the .j3o files created by the JME3 scene editor
+        // See https://github.com/jMonkeyEngine/jmonkeyengine/issues/352
+        assetManager.unregisterLocator("/", AndroidLocator.class);
+        assetManager.registerLocator("",AndroidLocator.class);
         rootNode.attachChild(assetManager.loadModel("Scenes/spilScene.j3o"));
 
         for (int i=1; ; i++) {
