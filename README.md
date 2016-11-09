@@ -65,3 +65,15 @@ Right now the only way I found (this is a really clumsy solution) is to override
 Culling is too aggressive in GVR - so disable it for now
 
     rootNode.setCullHint(Spatial.CullHint.Never);
+
+## Textures are missing
+
+Try to remove wrong path in Android Assetmanager:
+assetManager.unregisterLocator("/", AndroidLocator.class);
+assetManager.registerLocator("",AndroidLocator.class);
+
+
+## The image is rendering upside down
+
+Im working on that one
+
