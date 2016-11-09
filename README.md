@@ -69,8 +69,8 @@ Culling is too aggressive in GVR - so disable it for now
 ## Textures are missing
 
 Try to remove wrong path in Android Assetmanager:
-assetManager.unregisterLocator("/", AndroidLocator.class);
-assetManager.registerLocator("",AndroidLocator.class);
+    assetManager.unregisterLocator("/", AndroidLocator.class);
+    assetManager.registerLocator("",AndroidLocator.class);
 
 
 ## The image is rendering upside down
