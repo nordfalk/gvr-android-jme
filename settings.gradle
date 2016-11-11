@@ -1,4 +1,10 @@
 include ':jme-gvr-bridge'
+//, ':jme3-core'
+
+// , ':jme3-android-native', ':jme3-desktop', ':jme3-plugins', ':jme3-android', ':jme3-core'
+
+///include ':jme-gvr-bridge', ':jme3-android-native', ':jme3-desktop', ':jme3-plugins', ':jme3-android'
+//include ':jme-gvr-bridge'
 include ':gvr:base'
 include ':gvr:common'
 include ':gvr:audio'

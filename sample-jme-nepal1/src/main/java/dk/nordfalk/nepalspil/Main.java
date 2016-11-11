@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jme3test.android.nepal1;
+package dk.nordfalk.nepalspil;
 
 
 import com.jme3.app.SimpleApplication;
@@ -11,12 +11,10 @@ import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ import java.util.Arrays;
 /**
  * @author rudz
  */
-public class TestNepal extends SimpleApplication {
+public class Main extends SimpleApplication {
 
     private ArrayList<Spatial> felter = new ArrayList<>();
     private ArrayList<Spiller> spillere = new ArrayList<>();
@@ -34,17 +32,17 @@ public class TestNepal extends SimpleApplication {
     float interpolation = 1;
 
     public static void main(String... argv) {
-        TestNepal app = new TestNepal();
+        Main app = new Main();
         app.setShowSettings(false);
         app.start();
     }
-
+/*
     @Override
     public void setSettings(AppSettings settings) {
         settings.setAudioRenderer(AppSettings.ANDROID_MEDIAPLAYER);
         super.setSettings(settings);
     }
-
+*/
     @Override
     public void simpleInitApp() {
         Texture manoj = assetManager.loadTexture("Textures/klippet-manoj.png");

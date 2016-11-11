@@ -1,4 +1,4 @@
-package jme3test.android.nepal1;
+package dk.nordfalk.nepalspil;
 
 import com.jme3.math.Transform;
 import com.jme3.scene.Node;

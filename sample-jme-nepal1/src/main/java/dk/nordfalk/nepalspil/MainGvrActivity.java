@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jme3test.android.nepal1;
+package dk.nordfalk.nepalspil;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -29,20 +29,23 @@ import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.jme3.app.AndroidGvrHarness;
 
+import java.util.Arrays;
+
 import javax.microedition.khronos.egl.EGLConfig;
 
-public class NepalActivity extends AndroidGvrHarness implements GvrView.StereoRenderer {
 
-    private static final String TAG = "NepalActivity";
+public class MainGvrActivity extends AndroidGvrHarness implements GvrView.StereoRenderer {
+
+    private static final String TAG = "MainGvrActivity";
 
     private Vibrator vibrator;
 
     private GvrAudioEngine gvrAudioEngine;
     private volatile int soundId = GvrAudioEngine.INVALID_ID;
 
-    public NepalActivity() {
+    public MainGvrActivity() {
         super();
-        appClass = TestNepal.class.getCanonicalName();
+        appClass = Main.class.getCanonicalName();
     }
 
     /**
@@ -147,6 +150,7 @@ public class NepalActivity extends AndroidGvrHarness implements GvrView.StereoRe
     @Override
     public void onNewFrame(HeadTransform headTransform) {
 
+        logger.warning("onNewFrame "+ Arrays.toString(headTransform.getHeadView())+" cam="+app.getCamera());
 
     /*
     // Build the camera matrix and apply it to the ModelView.
@@ -178,6 +182,9 @@ public class NepalActivity extends AndroidGvrHarness implements GvrView.StereoRe
      */
     @Override
     public void onDrawEye(Eye eye) {
+        String øjenavn = (eye.getType() == Eye.Type.LEFT ? "Left" : (eye.getType() == Eye.Type.RIGHT ? "Right" : "MONOCULAR"));
+        logger.warning("onDrawEye "+øjenavn+" cam="+eye.getFov());
+        checkGLError("FØR ctx.onDrawEye(eye)");
         ctx.onDrawEye(eye);
 
         checkGLError("ctx.onDrawEye(eye)");
