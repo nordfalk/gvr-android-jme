@@ -241,10 +241,10 @@ public class GvrOGLESContext implements JmeContext, GvrView.StereoRenderer, Soft
 
     @Override
     public void onNewFrame(HeadTransform headTransform) {
+        logger.fine("onNewFrame ");
         // Build the camera matrix and apply it to the ModelView.
         if(app.getCamera() != null) {
             Camera cam = app.getCamera();
-
             headTransform.getQuaternion(headRotation, 0);
             orientation.set(headRotation[3], headRotation[2], headRotation[1], headRotation[0]);
             cam.setRotation(orientation);
@@ -253,32 +253,33 @@ public class GvrOGLESContext implements JmeContext, GvrView.StereoRenderer, Soft
 
     float[] perspective = new float[16];
     private Matrix4f projMatrix = new Matrix4f();
+
+    private void setCamProjectionMatrix(Eye eye, Camera cam) {
+        FieldOfView fov = eye.getFov();
+
+        // Fix a Frustum (they represent it as angles, so we have to calculate a little)
+        float l = (float) (-Math.tan(Math.toRadians((double) fov.getLeft()))) * Z_NEAR;
+        float r = (float) Math.tan(Math.toRadians((double) fov.getRight())) * Z_NEAR;
+        float b = (float) (-Math.tan(Math.toRadians((double) fov.getBottom()))) * Z_NEAR;
+        float t = (float) Math.tan(Math.toRadians((double) fov.getTop())) * Z_NEAR;
+        cam.setFrustum(Z_NEAR, Z_FAR, l, r, t, b);
+
+        // Setup perspective
+        fov.toPerspectiveMatrix(Z_NEAR, Z_FAR, perspective, 0);
+        projMatrix.set(perspective);
+        cam.setProjectionMatrix(projMatrix);
+    }
+
     // SystemListener:update
     @Override
     public void onDrawEye(Eye eye) {
         // FIXME: Move the updating part into onNewFrame(...)
+        String eyeName = (eye.getType() == Eye.Type.LEFT ? "Left" : (eye.getType() == Eye.Type.RIGHT ? "Right" : "MONOCULAR"));
+        logger.fine("onDrawEye "+eyeName);
 
         if(app.getCamera() != null) {
-            logger.fine("Eye: "+(eye.getType() == Eye.Type.LEFT ? "Left" : (eye.getType() == Eye.Type.RIGHT ? "Right" : "MONOCULAR")));
 
-            Camera cam = app.getCamera();
-            FieldOfView fov = eye.getFov();
-
-            // Fix a Frustum (they represent it as angles, so we have to calculate a little)
-            {
-                float l = (float) (-Math.tan(Math.toRadians((double) fov.getLeft()))) * Z_NEAR;
-                float r = (float) Math.tan(Math.toRadians((double) fov.getRight())) * Z_NEAR;
-                float b = (float) (-Math.tan(Math.toRadians((double) fov.getBottom()))) * Z_NEAR;
-                float t = (float) Math.tan(Math.toRadians((double) fov.getTop())) * Z_NEAR;
-                cam.setFrustum(Z_NEAR, Z_FAR, l, r, t, b);
-            }
-
-            // Setup perspective
-            {
-                fov.toPerspectiveMatrix(Z_NEAR, Z_FAR, perspective, 0);
-                projMatrix.set(perspective);
-                cam.setProjectionMatrix(projMatrix);
-            }
+            setCamProjectionMatrix(eye, app.getCamera());
 
         }
 
