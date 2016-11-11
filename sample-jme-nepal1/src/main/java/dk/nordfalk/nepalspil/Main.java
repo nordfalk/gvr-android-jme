@@ -1,96 +1,128 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dk.nordfalk.nepalspil;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.AndroidLocator;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
-import com.jme3.math.FastMath;
-import com.jme3.math.Transform;
-import com.jme3.math.Vector3f;
+import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import dk.nordfalk.nepalspil.kontrol.BrikRoterKontrol;
+import dk.nordfalk.nepalspil.kontrol.BrikStøvKontrol;
+
 /**
- * @author rudz
+ *
+ * @author Jacob Nordfalk
  */
 public class Main extends SimpleApplication {
+    public static boolean ANDROID_WORKAROUND;
 
     private ArrayList<Spatial> felter = new ArrayList<>();
     private ArrayList<Spiller> spillere = new ArrayList<>();
-    private Material fodMat;
     float tidTilRyk = 1;
-    float interpolation = 1;
 
-    public static void main(String... argv) {
+    BitmapText infoTekst;
+
+    public static void main(String[] args) {
         Main app = new Main();
         app.setShowSettings(false);
+
+        AppSettings cfg = new AppSettings(true);
+        cfg.setFrameRate(60); // set to less than or equal screen refresh rate
+        cfg.setResolution(1280, 720);   
+        cfg.setFrequency(60); // set to screen refresh rate
+        cfg.setTitle("Nepalspillet - Jacob Nordfalk");
+        cfg.setVSync(true);   // prevents page tearing
+        cfg.setSamples(4);    // anti-aliasing
+        app.setSettings(cfg);
+
         app.start();
     }
-/*
-    @Override
-    public void setSettings(AppSettings settings) {
-        settings.setAudioRenderer(AppSettings.ANDROID_MEDIAPLAYER);
-        super.setSettings(settings);
-    }
-*/
+
+
     @Override
     public void simpleInitApp() {
-        Texture manoj = assetManager.loadTexture("Textures/klippet-manoj.png");
-
-        Node laxmiBrik = lavBrik(assetManager.loadTexture("Textures/klippet-laxmi.png"));
-        Node abishakBrik = lavBrik(assetManager.loadTexture("Textures/klippet-abishak.png"));
-        Node bishalBrik = lavBrik(assetManager.loadTexture("Textures/klippet-bishal.png"));
-        abishakBrik.rotate(0, 10, 0).scale(0.6f);
-        bishalBrik.rotate(0, 10, 0).scale(0.6f);;
-        abishakBrik.getLocalTranslation().x += 2;
-        bishalBrik.getLocalTranslation().x -= 3;
-
+        Node manojBrik = lavSpillerbrik(assetManager.loadTexture("Textures/klippet-manoj.png"));
+        Node laxmiBrik = lavSpillerbrik(assetManager.loadTexture("Textures/klippet-laxmi.png"));
+        Node abishakBrik = lavSpillerbrik(assetManager.loadTexture("Textures/klippet-abishak.png"));
+        Node bishalBrik = lavSpillerbrik(assetManager.loadTexture("Textures/klippet-bishal.png"));
+        abishakBrik.rotate(0, 10, 0).scale(0.5f);
+        bishalBrik.rotate(0, 10, 0).scale(0.5f);;
+        laxmiBrik.rotate(0, 10, 0).scale(0.5f);;
+        
         spillere.addAll(Arrays.asList(
-                new Spiller(laxmiBrik, "Laxmi"),
-                new Spiller(abishakBrik, "Abishak"),
-                new Spiller(bishalBrik, "Bishal")));
+                new Spiller("Manoj", manojBrik),
+                new Spiller("Laxmi", laxmiBrik),
+                new Spiller("Abishak", abishakBrik),
+                new Spiller("Bishal", bishalBrik)));
 
-        // Workaround for missing texture because of wrong path in the .j3o files created by the JME3 scene editor
-        // See https://github.com/jMonkeyEngine/jmonkeyengine/issues/352
-        assetManager.unregisterLocator("/", AndroidLocator.class);
-        assetManager.registerLocator("",AndroidLocator.class);
-        rootNode.attachChild(assetManager.loadModel("Scenes/spilScene.j3o"));
+        if (ANDROID_WORKAROUND) {
+            // Workaround for missing texture because of wrong path in the .j3o files created by the JME3 scene editor
+            // See https://github.com/jMonkeyEngine/jmonkeyengine/issues/352
+            AssetManager assetManager = getAssetManager();
+            assetManager.unregisterLocator("/", AndroidLocator.class);
+            assetManager.registerLocator("", AndroidLocator.class);
 
-        for (int i=1; ; i++) {
-            Spatial felt = rootNode.getChild("Felt"+i);
-            System.out.println("felt= "+ felt);
-            if (felt==null) break;
-            felt.setUserData("nummer", i);
+            // Culling is too aggressive in GVR - so disable it for now
+            rootNode.setCullHint(Spatial.CullHint.Never);
+        }
+
+        guiFont = assetManager.loadFont("Interface/Fonts/FreeSans.fnt");
+        infoTekst = new BitmapText(guiFont, false);
+        infoTekst.setText("Her kommer en tekst");
+        infoTekst.setLocalTranslation(300, infoTekst.getLineHeight()+30, 0);
+        guiNode.attachChild(infoTekst);
+        
+/*
+*/
+        Spatial scene = assetManager.loadModel("Scenes/spilScene.j3o");
+        rootNode.attachChild(scene);
+
+        for (int i = 1;; i++) {
+            Spatial felt = rootNode.getChild("Felt" + i);
+            if (felt == null) break;
             felter.add(felt);
         }
-        System.out.println("felter= "+ felter);
+        System.out.println("felter= " + felter);
+        for (Spiller sp : spillere) {
+            rootNode.attachChild(sp.node);
+            sp.ryk.startRykTil(felter.get(0));
+            sp.node.addControl(new BrikStøvKontrol(assetManager, sp.node));
+        }
+/*        
+        // Flyt belysning fra scenen over til rootNode - ellers belyses brikkerne ikke som resten!!!!
+        for (Light l : scene.getLocalLightList().clone()) rootNode.addLight(l); 
+        scene.getLocalLightList().clear();
 
-        rootNode.attachChild(laxmiBrik);
-        rootNode.attachChild(abishakBrik);
-        rootNode.attachChild(bishalBrik);
+        DirectionalLight l = (DirectionalLight) rootNode.getLocalLightList().get(0); //  new DirectionalLight();
 
-        // Culling is too aggressive in GVR - so disable it for now
-        rootNode.setCullHint(Spatial.CullHint.Never);
+        int SHADOWMAP_SIZE = 1024;
+        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
+        dlsr.setLight(l);
+        //dlsr.setLambda(0.055f);
+        dlsr.setShadowIntensity(0.5f);
+        dlsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
+        viewPort.addProcessor(dlsr);
 
-
+        rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+*/
+//        rootNode.setCullHint(Spatial.CullHint.Never);
         // Ryk kameraet op og til siden
-        cam.setLocation( cam.getLocation().add(2, 3, -3));
-        cam.lookAt(new Vector3f(), new Vector3f(0, 1, 0)); // peg det ind på spillepladen
-
+        cam.setLocation( cam.getLocation().add(-2, 4, -4));
     }
 
-    private Node lavBrik(Texture billede) {
-        fodMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    private Node lavSpillerbrik(Texture billede) {
+        Material fodMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         fodMat.setTexture("ColorMap", assetManager.loadTexture("Textures/dirt.jpg"));
         Spatial fod = assetManager.loadModel("Models/nepalbrik-fod/nepalbrik-fodfbx.j3o");
         fod.setMaterial(fodMat);
@@ -103,7 +135,7 @@ public class Main extends SimpleApplication {
         laxmiMat.setTexture("ColorMap", billede);
         brikGeom.setMaterial(laxmiMat);
 
-        Node fodOgBilledeNode = new Node();
+        Node fodOgBilledeNode = new Node(billede.getName());
         fodOgBilledeNode.attachChild(billedeNode);
         fodOgBilledeNode.attachChild(fod);
         fodOgBilledeNode.scale(0.5f);
@@ -121,39 +153,15 @@ public class Main extends SimpleApplication {
             Spiller sp = spillere.get((int) (Math.random() * spillere.size()));
             int slag = 1 + (int) (6 * Math.random());
 
-            sp.rykFra = felter.get(sp.feltNr).getLocalTransform();
             sp.feltNr = (sp.feltNr + slag) % felter.size();
-            sp.rykTil = felter.get(sp.feltNr).getLocalTransform().clone(); // Variér position lidt
-            sp.rykTil.getTranslation().addLocal(FastMath.rand.nextFloat() / 5 - 0.1f, 0, FastMath.rand.nextFloat() / 5 - 0.1f);
-            Spatial felt = felter.get(sp.feltNr);
-
-            sp.node.setLocalTranslation(felt.getLocalTranslation());
-            sp.node.setLocalRotation(felt.getLocalRotation());
-            interpolation = 0;
-        }
-
-        if (interpolation == 1) return;
-        interpolation += tpf * 3;
-        if (interpolation > 1) {
-            interpolation = 1;
-        }
-        float inter = interpolation;
-        inter = (inter * inter);
-        //inter = (inter*inter*inter + 1-(1-inter)*(1-inter)*(1-inter))/2;
-        //System.out.printf("interpolation=%.2f  inter=%.2f\n", interpolation, inter);
-        for (Spiller sp : spillere) {
-            if (sp.rykFra == sp.rykTil) continue;
-            Transform spt = sp.node.getLocalTransform();
-            //spt.interpolateTransforms(sp.rykFra, sp.rykTil, interpolation); // ryk uden at hoppe
-            spt.getRotation().slerp(sp.rykFra.getRotation(), sp.rykTil.getRotation(), inter);
-            Vector3f fra = sp.rykFra.getTranslation();
-            Vector3f til = sp.rykTil.getTranslation();
-            Vector3f midt = fra.clone().interpolateLocal(til, 0.5f).add(0, 1, 0);
-            FastMath.interpolateBezier(inter, fra, midt, midt, til, spt.getTranslation());
-            sp.node.setLocalTransform(spt);
-            if (interpolation == 1) {
-                sp.rykFra = sp.rykTil;
+            sp.ryk.startRykTil(felter.get(sp.feltNr));
+            if (slag==6) {
+                sp.node.getControl(BrikRoterKontrol.class).start();
+                infoTekst.setText(sp.navn + " slog en 6'er!");
+            } else {
+                infoTekst.setText(sp.navn + " rykker til felt "+sp.feltNr);                
             }
+            if (slag >= 5) sp.ryk.støvNårDenLander = true;
         }
     }
 }

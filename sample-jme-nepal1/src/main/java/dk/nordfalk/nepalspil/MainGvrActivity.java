@@ -46,6 +46,7 @@ public class MainGvrActivity extends AndroidGvrHarness implements GvrView.Stereo
     public MainGvrActivity() {
         super();
         appClass = Main.class.getCanonicalName();
+        Main.ANDROID_WORKAROUND = true;
     }
 
     /**
